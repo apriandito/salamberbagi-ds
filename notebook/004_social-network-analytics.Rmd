@@ -4,6 +4,18 @@ author: "Muhammad Apriandito"
 ---
 
 ```{r}
+# Set Seed
+set.seed(0000)
+```
+
+```{r}
+# Install packages
+install.packages("tidygraph")
+install.packages("ggraph")
+install.packages("igraph")
+```
+
+```{r}
 # Load library
 library(tidyverse)
 library(tidygraph)

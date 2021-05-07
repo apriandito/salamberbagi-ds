@@ -10,7 +10,14 @@ set.seed(0000)
 
 # Install Package
 ```{r}
-
+install.packages("tidyverse")
+install.packages("tidymodels")
+install.packages("rpart.plot")
+install.packages("discrim")
+install.packages("naivebayes")
+install.packages("kernlab")
+install.packages("skimr")
+install.packages("themis")
 ```
 
 # Load Package

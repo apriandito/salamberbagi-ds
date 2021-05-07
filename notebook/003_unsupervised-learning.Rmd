@@ -5,7 +5,11 @@ author: "Muhammad Apriandito"
 
 ```{r}
 # Set Seed
-set.seed(123)
+set.seed(0000)
+```
+
+```{r}
+install.packages("factoextra")
 ```
 
 # Load Library
