@@ -1,0 +1,105 @@
+---
+title: "Social Network Analytics"
+author: "Muhammad Apriandito"
+---
+
+```{r}
+# Load library
+library(tidyverse)
+library(tidygraph)
+library(ggraph)
+library(igraph)
+```
+
+```{r}
+# Load data
+df <- read_rds("data/tweet-mudik-filtered.rds")
+head(df)
+```
+
+```{r}
+# Membuat Edge List Mention
+df_network <- df %>%
+  select(screen_name, mentions_screen_name) %>%
+  unnest(mentions_screen_name) %>%
+  drop_na() %>%
+  rename(source = screen_name, target = mentions_screen_name) %>%
+  select(source, target)
+
+df_network
+```
+
+```{r}
+# Membuat Network
+g <- graph_from_data_frame(df_network, directed = FALSE)
+```
+
+```{r}
+# Pengukuran Metrik Jejaring sosial
+metrik_network <- tibble(jumlah_node = vcount(g), 
+                         jumlah_edge = ecount(g), 
+                         average_path_length = average.path.length(g), 
+                         diameter = diameter(g), 
+                         density = edge_density(g), 
+                         modularity = modularity(cluster_louvain(g)))
+
+metrik_network
+```
+
+```{r}
+# Mengukur Metrik Sentralitas
+g_tidy <- as_tbl_graph(g) %>%
+  mutate(degree_centrality = centrality_degree()) %>%
+  mutate(betweenness_centrality = centrality_betweenness()) %>%
+  mutate(eigen_centrality = centrality_eigen()) %>%
+  mutate(modularity = group_louvain())
+```
+
+```{r}
+# Menampilkan hasil pengukuran sentralitas
+g_tidy %>%
+  arrange(desc(degree_centrality)) %>%
+  as_tibble()
+```
+
+```{r}
+# Memvisualisasikan Network
+plot <- g_tidy %>%
+  filter(degree_centrality > 10) %>%
+  mutate(connected_component = group_components()) %>%
+  filter(connected_component == 1) %>%
+  ggraph(layout = "stress") +
+  geom_edge_link2(aes(edge_colour = as.factor(node.modularity)),
+                  edge_width = 0.3, 
+                  edge_alpha = 0.4) +
+  geom_node_point(aes(
+    colour = as.factor(modularity),
+    size = degree_centrality,
+    alpha = 0.8
+  ), position = "identity") +
+  geom_node_text(aes(filter = degree_centrality >= 100,
+    size = degree_centrality,
+    label = name
+  ),
+  alpha = 0.8,
+  check_overlap = T,
+  repel = F
+  ) +
+  scale_size(range = c(1, 7)) +
+  theme_graph() +
+  theme(legend.position = "none")
+```
+
+```{r}
+# Menyimpan hasil visualisasi network
+ggsave(plot,
+  filename = "plot/network.png",
+  width = 30,
+  height = 30,
+  dpi = 300,
+  type = "cairo",
+  units = "cm",
+  limitsize = FALSE
+)
+```
+

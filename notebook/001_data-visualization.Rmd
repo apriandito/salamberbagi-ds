@@ -1,0 +1,53 @@
+---
+title: "Data Visualization"
+author: "Muhammad Apriandito"
+---
+
+```{r}
+# Install Package
+install.packages("plotly")
+install.packages("gapminder")
+```
+
+```{r}
+# Load Package
+library(plotly)
+library(gapminder)
+```
+
+```{r}
+# Mengimport Data Gapmider
+df <- gapminder
+```
+
+```{r}
+# Menampilkan 5 Baris Pertama Data
+head(df)
+```
+
+```{r message=FALSE, warning=FALSE}
+# Visualization 
+fig <- df %>%
+  plot_ly(
+    x = ~gdpPercap,
+    y = ~lifeExp,
+    size = ~pop,
+    color = ~continent,
+    frame = ~year,
+    text = ~country,
+    hoverinfo = "text",
+    type = "scatter",
+    mode = "markers"
+  ) %>%
+  layout(
+    xaxis = list(
+      type = "log"
+    )
+  )
+```
+
+```{r message=FALSE, warning=FALSE}
+# Menampilkan Hasil Visualisasi
+fig
+```
+

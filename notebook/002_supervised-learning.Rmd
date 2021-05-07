@@ -1,0 +1,226 @@
+---
+title: "Supervised Learning - Classification"
+author: "Muhammad Apriandito"
+---
+
+```{r}
+# Set Seed
+set.seed(0000)
+```
+
+# Install Package
+```{r}
+
+```
+
+# Load Package
+```{r}
+# Meload Package yang sudah di Install
+library(tidyverse)
+library(tidymodels)
+library(rpart)
+library(rpart.plot)
+library(discrim)
+library(kernlab)
+library(skimr)
+library(themis)
+```
+
+# Load Data
+```{r}
+# Import Data Ke Dalam Environtment R
+df <- read_csv("data/credit-risk.csv")
+```
+
+# Eksplorasi Data
+```{r}
+# Lihat Data Keseluruhan
+df
+```
+
+```{r}
+# Melihat keseluruhan variable
+glimpse(df)
+```
+
+```{r}
+# Melihat rangkuman informasi data
+skim(df)
+```
+
+```{r}
+# Melihat distribusi target variable 
+df %>%
+  group_by(Risk) %>%
+  count() %>%
+  ggplot(aes(x = Risk, y = n, fill = Risk)) +
+  geom_col()
+```
+
+# Split Data
+```{r}
+# Membagi data dengan proporsi 70:30
+df_split <- initial_split(df, prop = 0.7)
+df_split
+```
+
+```{r}
+# Menampilkan data training
+df_split %>%
+  training() %>%
+  glimpse()
+```
+
+```{r}
+# Menampilkan data testing
+df_split %>%
+  testing() %>%
+  glimpse()
+```
+
+# Membuat Alur Pemrosesan Data
+```{r}
+# Membuat alur pemrosesan data
+df_recipe <- training(df_split) %>%
+  recipe(Risk ~ Age + Sex + Job + Housing + `Saving accounts` + `Checking account` + `Credit amount` + Duration + Purpose) %>%
+  step_mutate_at(Job, fn = factor) %>%
+  step_modeimpute(`Saving accounts`, `Checking account`) %>%
+  prep()
+
+df_recipe
+```
+
+```{r}
+# Mererapkan ke data training
+df_training <- juice(df_recipe)
+
+glimpse(df_training)
+```
+
+```{r}
+# Menerapkan ke data testing
+df_testing <- df_recipe %>%
+  bake(testing(df_split))
+
+glimpse(df_testing)
+```
+
+# Menentukan Algoritma
+```{r}
+# Algoritma Decision Tree
+dt <- decision_tree(tree_depth = 4) %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+```
+
+```{r}
+# Algoritma Naive Bayes
+nb <-  naive_Bayes() %>% 
+  set_engine("naivebayes") %>% 
+  translate()
+```
+
+
+# Menggabungkan Model dan Alur Pemrosan data kedalam Workflow
+```{r}
+# Membuat Workflow Decision Tree
+workflow_dt <- workflow() %>%
+  add_model(dt) %>%
+  add_recipe(df_recipe)
+
+```
+
+```{r}
+# Membuat workflow Naive Bayes
+workflow_nb <- workflow() %>%
+  add_model(nb) %>%
+  add_recipe(df_recipe)
+```
+
+# Training
+
+## Decision Tree
+```{r}
+# Training Model Decision Tree 
+dt_mod <- fit(workflow_dt, training(df_split))
+dt_mod
+```
+
+```{r}
+# Memvisualisasikan Model Decision Tree
+tree_fit <- dt_mod %>% 
+  pull_workflow_fit()
+rpart.plot(tree_fit$fit, roundint=FALSE)
+```
+
+## Naive Bayes
+```{r}
+### Training Model for the Naive Bayes Algorithm
+nb_mod <- fit(workflow_nb, training(df_split))
+```
+
+# Testing
+```{r}
+# Prediksi ke data testing menggunakan model decision tree
+dt_mod %>%
+  predict(testing(df_split)) %>%
+  bind_cols(testing(df_split))
+```
+
+```{r}
+# Prediksi ke data testing menggunakan model Naive Bayes
+nb_mod %>%
+  predict(testing(df_split)) %>%
+  bind_cols(testing(df_split))
+```
+
+```{r}
+# Menentukan metrik evaluasi
+multi_metrics <- metric_set(accuracy, 
+                            precision, 
+                            recall, 
+                            specificity,
+                            f_meas)
+```
+
+```{r}
+# Evaluasi model Decison Tree
+dt_mod %>%
+  predict(testing(df_split)) %>%
+  bind_cols(df_testing) %>%
+  multi_metrics(truth = Risk, estimate = .pred_class)
+```
+
+```{r}
+# Evaluasi model Naive Bayes
+nb_mod  %>%
+  predict(testing(df_split)) %>%
+  bind_cols(df_testing) %>%
+  multi_metrics(truth = Risk, estimate = .pred_class)
+```
+
+# Mengaplikasikan model ke pangajuan kredit baru
+
+```{r}
+# Membuat data pengajuan kredit baru
+df_newcredit <- tibble(Age = 23, 
+                       Sex = "male", 
+                       Job = 2, 
+                       Housing = "rent", 
+                       `Saving accounts` = "little", 
+                       `Checking account` = "little", 
+                       `Credit amount` = 500, 
+                       Duration = 20, 
+                       Purpose = "radio/TV"
+                       )
+
+print(df_newcredit)
+```
+
+```{r}
+# Prediksi menggunakan model naive bayes
+nb_mod %>%
+  predict(df_newcredit) %>%
+  bind_cols(df_newcredit)
+```
+
