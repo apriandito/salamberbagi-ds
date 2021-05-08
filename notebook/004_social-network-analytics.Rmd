@@ -89,7 +89,7 @@ plot <- g_tidy %>%
   ggraph(layout = "stress") +
   geom_edge_arc2(aes(edge_colour = as.factor(node.modularity)),
     edge_width = 0.3,
-    strength = 0.5,
+    strength = 0.8,
     edge_alpha = 0.4
   ) +
   geom_node_point(aes(
