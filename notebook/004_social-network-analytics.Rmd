@@ -87,15 +87,18 @@ plot <- g_tidy %>%
   mutate(connected_component = group_components()) %>%
   filter(connected_component == 1) %>%
   ggraph(layout = "stress") +
-  geom_edge_link2(aes(edge_colour = as.factor(node.modularity)),
-                  edge_width = 0.3, 
-                  edge_alpha = 0.4) +
+  geom_edge_arc2(aes(edge_colour = as.factor(node.modularity)),
+    edge_width = 0.3,
+    strength = 0.5,
+    edge_alpha = 0.4
+  ) +
   geom_node_point(aes(
     colour = as.factor(modularity),
     size = degree_centrality,
     alpha = 0.8
   ), position = "identity") +
-  geom_node_text(aes(filter = degree_centrality >= 100,
+  geom_node_text(aes(
+    filter = degree_centrality >= 100,
     size = degree_centrality,
     label = name
   ),

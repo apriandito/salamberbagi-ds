@@ -51,7 +51,7 @@ df %>%
 df_cluster <- df %>%
   select(Income, Spending)
 
-head(df_income )
+head(df_cluster)
 ```
 
 # Mencari Jumlah Cluster Optimal
