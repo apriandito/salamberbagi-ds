@@ -8,13 +8,14 @@ author: "Muhammad Apriandito"
 set.seed(0000)
 ```
 
+# Install Package
 ```{r}
 install.packages("factoextra")
 ```
 
-# Load Library
+# Load Package
 ```{r}
-# Load library
+# Load package
 library(tidyverse) 
 library(cluster)
 library(factoextra)
@@ -49,7 +50,6 @@ df %>%
 # Select Data
 df_cluster <- df %>%
   select(Income, Spending)
-
 
 head(df_income )
 ```

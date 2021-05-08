@@ -10,7 +10,7 @@ set.seed(0000)
 
 # Install Package
 ```{r}
-install.packages("tidyverse")
+# Instalasi package
 install.packages("tidymodels")
 install.packages("rpart.plot")
 install.packages("discrim")
@@ -22,7 +22,7 @@ install.packages("themis")
 
 # Load Package
 ```{r}
-# Meload Package yang sudah di Install
+# Meload package yang sudah di Install
 library(tidyverse)
 library(tidymodels)
 library(rpart)
@@ -35,13 +35,13 @@ library(themis)
 
 # Load Data
 ```{r}
-# Import Data Ke Dalam Environtment R
+# Import data ke dalam environtment R
 df <- read_csv("data/credit-risk.csv")
 ```
 
 # Eksplorasi Data
 ```{r}
-# Lihat Data Keseluruhan
+# Lihat keseluruhan data
 df
 ```
 
@@ -207,7 +207,6 @@ nb_mod  %>%
 ```
 
 # Mengaplikasikan model ke pangajuan kredit baru
-
 ```{r}
 # Membuat data pengajuan kredit baru
 df_newcredit <- tibble(Age = 23, 

@@ -8,29 +8,33 @@ author: "Muhammad Apriandito"
 set.seed(0000)
 ```
 
+# Install Package
 ```{r}
-# Install packages
+# Install package
 install.packages("tidygraph")
 install.packages("ggraph")
 install.packages("igraph")
 ```
 
+# Load Package
 ```{r}
-# Load library
+# Load package
 library(tidyverse)
 library(tidygraph)
 library(ggraph)
 library(igraph)
 ```
 
+# Import Data
 ```{r}
 # Load data
 df <- read_rds("data/tweet-mudik-filtered.rds")
 head(df)
 ```
 
+# Membuat Network
 ```{r}
-# Membuat Edge List Mention
+# Membuat edge-List mention
 df_network <- df %>%
   select(screen_name, mentions_screen_name) %>%
   unnest(mentions_screen_name) %>%
@@ -42,12 +46,13 @@ df_network
 ```
 
 ```{r}
-# Membuat Network
+# Membuat network
 g <- graph_from_data_frame(df_network, directed = FALSE)
 ```
 
+# Pengukuran Metrik
 ```{r}
-# Pengukuran Metrik Jejaring sosial
+# Pengukuran network secara keseluruhan
 metrik_network <- tibble(jumlah_node = vcount(g), 
                          jumlah_edge = ecount(g), 
                          average_path_length = average.path.length(g), 
@@ -59,7 +64,7 @@ metrik_network
 ```
 
 ```{r}
-# Mengukur Metrik Sentralitas
+# Mengukur metrik sentralitas
 g_tidy <- as_tbl_graph(g) %>%
   mutate(degree_centrality = centrality_degree()) %>%
   mutate(betweenness_centrality = centrality_betweenness()) %>%
@@ -74,8 +79,9 @@ g_tidy %>%
   as_tibble()
 ```
 
+# Visualisasi Network
 ```{r}
-# Memvisualisasikan Network
+# Memvisualisasikan network
 plot <- g_tidy %>%
   filter(degree_centrality > 10) %>%
   mutate(connected_component = group_components()) %>%

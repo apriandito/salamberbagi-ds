@@ -3,30 +3,75 @@ title: "Data Visualization"
 author: "Muhammad Apriandito"
 ---
 
-```{r}
 # Install Package
+```{r}
+# Install package
+install.packages("tidyverse")
 install.packages("plotly")
 install.packages("gapminder")
 ```
 
-```{r}
 # Load Package
+```{r}
+# Load package
+library(tidyverse)
 library(plotly)
 library(gapminder)
 ```
 
+# Import Data
 ```{r}
 # Mengimport Data Gapmider
 df <- gapminder
 ```
 
 ```{r}
-# Menampilkan 5 Baris Pertama Data
+# Menampilkan 5 baris pertama data
 head(df)
 ```
 
+```{r}
+# Melihat rangkuman data
+glimpse(df)
+```
+
+# Visualisasi Data: ggplot2
+```{r}
+# Rata-rata populasi setiap benua tahun 2007
+options(scipen=10000)
+
+df %>%
+  group_by(continent, year) %>%
+  mutate(mean_pop = mean(pop)) %>%
+  filter(year == 2007) %>%
+  ggplot(aes(x = continent, y = mean_pop, fill = continent)) +
+  geom_col()
+```
+
+```{r}
+# Melihat perkembangan populasi seluruh negara
+df %>%
+  ggplot(aes(x = year, y = pop, by = country, color = continent)) +
+  geom_line()
+```
+
+```{r}
+# Melihat perkembangan gdp setiap negara
+df %>%
+  ggplot(aes(x = year, y = gdpPercap, by = country, color = continent)) +
+  geom_line()
+```
+
+```{r}
+# Melihat perkembangan ekspektasi hidup setiap negara
+df %>%
+  ggplot(aes(x = year, y = lifeExp, by = country, color = continent)) +
+  geom_line()
+```
+
+# Visualisasi Interaktif: ggplot2
 ```{r message=FALSE, warning=FALSE}
-# Visualization 
+# Mambuat visualisasi interaktif
 fig <- df %>%
   plot_ly(
     x = ~gdpPercap,
@@ -50,4 +95,3 @@ fig <- df %>%
 # Menampilkan Hasil Visualisasi
 fig
 ```
-
